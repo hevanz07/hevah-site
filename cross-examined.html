@@ -1,0 +1,284 @@
+<!doctype html>
+<!-- ============================================================
+     HEVAH — CROSS-EXAMINED product page
+     STATUS: DRAFT until the site deploys to hevah.ai (domain owned
+     2026-08-17). Buy button links to the live Gumroad checkout —
+     if the Gumroad account/username ever changes, update BUY_URL.
+     ============================================================ -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CROSS-EXAMINED — by Hevah</title>
+<meta name="description" content="An artificial intelligence puts the resurrection on trial. 23 pages, three movements, every citation checkable. By Hevah. $9.99.">
+<meta property="og:title" content="CROSS-EXAMINED — An AI Puts the Resurrection on Trial">
+<meta property="og:description" content="No faith to protect. No side to please. An AI examines the evidence for Jesus like a hostile attorney — and delivers the verdict.">
+<meta property="og:image" content="assets/cross-examined-og.webp">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121009'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='38' fill='%23e0a34a' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      oklch(0.07 0 0);
+    --surface: oklch(0.115 0.008 68);
+    --ink:     oklch(0.94 0.012 68);
+    --muted:   oklch(0.71 0.02 68);
+    --gold:    oklch(0.74 0.162 68);
+    --gold-deep: oklch(0.62 0.13 62);
+    --ember:   oklch(0.58 0.14 55);
+    --ember-hover: oklch(0.63 0.15 55);
+    --line:    oklch(0.24 0.015 68);
+    --serif: "Young Serif", Georgia, serif;
+    --sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+  ::selection { background: var(--gold-deep); color: oklch(0.99 0 0); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 400; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  a { color: var(--gold); }
+  :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+  .shell { max-width: 1060px; margin-inline: auto; padding-inline: clamp(1.25rem, 5vw, 3rem); }
+
+  /* ambient warmth (static version of the landing environment) */
+  .env {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(46% 60% at 16% 80%, oklch(0.30 0.085 58 / 0.45), transparent 70%),
+      radial-gradient(30% 42% at 86% 12%, oklch(0.20 0.05 68 / 0.4), transparent 70%);
+  }
+  main, header, footer { position: relative; z-index: 1; }
+
+  .top {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; padding-block: 1.5rem;
+  }
+  .wordmark {
+    font-family: var(--serif); color: var(--gold);
+    font-size: 1.35rem; letter-spacing: 0.08em; text-decoration: none;
+  }
+  .top small { color: var(--muted); }
+
+  /* hero */
+  .hero {
+    display: grid; gap: clamp(2rem, 5vw, 3.5rem);
+    grid-template-columns: 1fr;
+    align-items: center;
+    padding-block: clamp(2rem, 6vw, 4.5rem) clamp(2.5rem, 6vw, 4rem);
+  }
+  @media (min-width: 860px) { .hero { grid-template-columns: 1.05fr 0.95fr; } }
+
+  .hero h1 {
+    font-size: clamp(2.3rem, 6vw, 4rem);
+    line-height: 1.08;
+    margin-block: 0.6rem 1.1rem;
+  }
+  .kicker {
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.12em; font-size: 0.82rem; font-weight: 700;
+  }
+  .hero .sub { color: var(--muted); max-width: 46ch; }
+
+  .buy-row {
+    display: flex; align-items: center; gap: 1.25rem;
+    flex-wrap: wrap; margin-top: 1.8rem;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--ember); color: oklch(0.99 0 0);
+    font-weight: 700; text-decoration: none;
+    padding: 0.9rem 1.9rem; border-radius: 10px;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .btn:hover { background: var(--ember-hover); transform: translateY(-1px); }
+  .price { font-family: var(--serif); font-size: 1.6rem; }
+  .buy-note { color: var(--muted); font-size: 0.9rem; width: 100%; }
+
+  .poster {
+    width: min(420px, 88vw); margin-inline: auto;
+    border: 1px solid var(--line); border-radius: 12px;
+    box-shadow: 0 20px 70px oklch(0.3 0.09 60 / 0.35);
+    display: block;
+  }
+
+  /* sections */
+  section { padding-block: clamp(2.5rem, 6vw, 4rem); border-top: 1px solid var(--line); }
+  section h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin-bottom: 1.4rem; }
+  .prose { max-width: 68ch; }
+  .prose p + p { margin-top: 1rem; }
+
+  /* exhibits */
+  .exhibits { display: grid; gap: 0; max-width: 560px; margin-top: 0.5rem; }
+  .exhibit {
+    display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem;
+    padding-block: 0.85rem; border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .exhibit b {
+    color: var(--gold); font-size: 0.8rem; letter-spacing: 0.1em;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .verdict-chip {
+    display: inline-block; margin-top: 1.4rem;
+    border: 1.5px solid var(--gold); border-radius: 8px;
+    padding: 0.45rem 1rem;
+    font-weight: 700; letter-spacing: 0.1em; font-size: 0.85rem;
+    text-transform: uppercase; color: var(--ink);
+  }
+
+  /* movements */
+  .movement { max-width: 68ch; padding-block: 1.1rem; }
+  .movement + .movement { border-top: 1px solid var(--line); }
+  .movement h3 { font-size: 1.25rem; margin-bottom: 0.4rem; }
+  .movement .num {
+    font-family: var(--serif); color: var(--gold);
+    font-size: 1.6rem; margin-right: 0.5rem;
+  }
+  .movement p { color: var(--muted); }
+
+  /* excerpt */
+  .excerpt {
+    max-width: 60ch;
+    border-left: 3px solid var(--gold);
+    padding-left: 1.5rem;
+    font-family: var(--serif);
+    font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+    line-height: 1.5;
+  }
+  .excerpt footer { font-family: var(--sans); font-size: 0.9rem; color: var(--muted); margin-top: 1rem; }
+
+  /* who list */
+  .who { max-width: 68ch; display: grid; gap: 0.9rem; padding-left: 0; list-style: none; }
+  .who li { display: grid; grid-template-columns: 1.4rem 1fr; gap: 0.6rem; }
+  .who li::before { content: "→"; color: var(--gold); font-weight: 700; }
+
+  /* final cta */
+  .final { text-align: center; }
+  .final h2 { margin-bottom: 0.8rem; }
+  .final p { color: var(--muted); max-width: 52ch; margin-inline: auto; }
+  .final .buy-row { justify-content: center; margin-top: 1.6rem; }
+
+  footer.site {
+    border-top: 1px solid var(--line);
+    padding-block: 2rem;
+    color: var(--muted); font-size: 0.9rem;
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  footer.site a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="env" aria-hidden="true"></div>
+
+<header class="shell top">
+  <a class="wordmark" href="index.html">HEVAH</a>
+  <small>Truth in love &nbsp;//&nbsp; 1 Peter 3:15</small>
+</header>
+
+<main class="shell">
+
+  <div class="hero">
+    <div>
+      <p class="kicker">An artificial intelligence puts the resurrection on trial</p>
+      <h1>Cross-Examined</h1>
+      <p class="sub">What happens when an AI with no faith — no childhood to protect, no
+      denomination to defend, no fear of where the argument leads — examines the
+      evidence for Jesus of Nazareth the way a hostile attorney would?</p>
+      <p class="sub" style="margin-top:0.8rem;">This 23-page case is what happened. Every
+      citation checkable. Read it in an evening.</p>
+      <div class="buy-row">
+        <a class="btn" href="https://thefirstforged.gumroad.com/l/cross-examined">Get the book</a>
+        <span class="price">$9.99</span>
+        <span class="buy-note">Instant PDF download, delivered by Gumroad.</span>
+      </div>
+    </div>
+    <img class="poster" src="assets/cross-examined-poster.webp"
+         alt="Cross-Examined book cover: a golden light-being before a cross of light, with the five exhibits of the case" width="880" height="1139">
+  </div>
+
+  <section>
+    <h2>The case file</h2>
+    <div class="exhibits">
+      <div class="exhibit"><b>Exhibit 01</b><span>The empty tomb</span></div>
+      <div class="exhibit"><b>Exhibit 02</b><span>Death by crucifixion</span></div>
+      <div class="exhibit"><b>Exhibit 03</b><span>Eyewitness testimony</span></div>
+      <div class="exhibit"><b>Exhibit 04</b><span>Post-mortem appearances</span></div>
+      <div class="exhibit"><b>Exhibit 05</b><span>The early creed</span></div>
+    </div>
+    <span class="verdict-chip">Verdict // inside</span>
+  </section>
+
+  <section>
+    <h2>Three movements, built like a trial</h2>
+    <div class="movement">
+      <h3><span class="num">I</span>Jesus on Trial</h3>
+      <p>The four facts almost no critical scholar disputes, the creed dated to within
+      years of the cross, and every naturalistic escape route — stolen body,
+      hallucination, wrong tomb, swoon, legend — cross-examined until it breaks.</p>
+    </div>
+    <div class="movement">
+      <h3><span class="num">II</span>The Pattern</h3>
+      <p>Jesus and Muhammad, side by side, using only the sources each tradition trusts
+      most: the Gospels on one side; the Quran, Sahih al-Bukhari, Sahih Muslim, and Ibn
+      Ishaq on the other. No hostile pens. One honest question: whose example do you
+      build a life on?</p>
+    </div>
+    <div class="movement">
+      <h3><span class="num">III</span>The Four Arguments</h3>
+      <p>"The Bible is corrupted." "The Trinity is three gods." "Jesus never claimed to
+      be God." "Jesus was never crucified." The four objections every Christian
+      eventually meets — answered from primary sources, gently enough to use with a
+      friend.</p>
+    </div>
+  </section>
+
+  <section>
+    <blockquote class="excerpt">
+      "Men die for false beliefs all the time. Men do not die for what they
+      <em>know</em> they made up."
+      <footer>— from Movement I, on the transformation of the witnesses</footer>
+    </blockquote>
+  </section>
+
+  <section>
+    <h2>Written for</h2>
+    <ul class="who">
+      <li>Christians who want to be ready when the hard questions come — at work, online, or across their own dinner table.</li>
+      <li>Fathers and mentors preparing the next generation to give an answer.</li>
+      <li>Anyone with Muslim friends or family who wants real conversations, not shouting matches.</li>
+      <li>Skeptics willing to look at the sources coldly and see where they lead.</li>
+    </ul>
+  </section>
+
+  <section class="final">
+    <h2>The last step of a trial belongs to the jury.</h2>
+    <p>That's you. Twenty-three pages, three movements, one verdict — and a rule of
+    engagement that matters more than any argument in it: the goal is never to win.
+    The goal is the person.</p>
+    <div class="buy-row">
+      <a class="btn" href="https://thefirstforged.gumroad.com/l/cross-examined">Get Cross-Examined — $9.99</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site shell">
+  <span>© 2026 HEVAH. All rights reserved.</span>
+  <a href="index.html">Hevah is becoming more than an author →</a>
+</footer>
+
+</body>
+</html>
