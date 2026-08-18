@@ -1,9 +1,10 @@
 <!doctype html>
 <!-- ============================================================
-     HEVAH — validation landing page (immersive build)
-     STATUS: DRAFT. Do not publish without Errol's explicit GO.
-     Form runs in demo mode (localStorage only) — on publish GO,
-     wire the chosen mechanic (HEVAH-PLAN.md "Waitlist mechanics").
+     HEVAH — validation landing page (immersive build + aura pass)
+     STATUS: LIVE at hevah.ai (GitHub Pages, hevanz07/hevah-site).
+     Any change deploys ONLY on Errol's explicit GO (push = publish).
+     Waitlist form still parked — wire Tally per HEVAH-PLAN.md
+     "Waitlist mechanics" when Errol creates the form.
      ============================================================ -->
 <html lang="en">
 <head>
@@ -155,8 +156,25 @@
   }
   @media (prefers-reduced-motion: reduce) { .rise { animation: none; } }
 
+  /* hero word choreography — JS splits the h1 into masked words;
+     .rise above stays as the no-JS / reduced-motion fallback */
+  .hero h1 .w {
+    display: inline-block; overflow: hidden; vertical-align: bottom;
+    padding-bottom: 0.12em; margin-bottom: -0.12em; /* keep descenders unclipped */
+  }
+  .hero h1 .wi { display: inline-block; }
+  .js.split .hero h1 .wi { transform: translateY(115%); }
+  .js.split .hero h1.ready .wi {
+    animation: wordUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i) * 75ms);
+  }
+  @keyframes wordUp { from { transform: translateY(115%); } to { transform: none; } }
+  .js.split .hero .rise.d1 { animation-delay: 0.55s; }
+  .js.split .hero .rise.d2 { animation-delay: 0.75s; }
+
   .btn {
     display: inline-block;
+    position: relative; overflow: hidden;
     font-family: var(--sans); font-weight: 700; font-size: 1.05rem;
     color: oklch(0.99 0 0);
     background: var(--ember);
@@ -164,15 +182,20 @@
     padding: 0.95rem 2rem;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.2s ease-out, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease-out;
+    will-change: transform;
+    transition: background 0.2s ease-out, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease-out;
   }
+  .btn::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 32%, oklch(0.99 0 0 / 0.16) 50%, transparent 68%);
+    transform: translateX(-130%);
+  }
+  .btn:hover::after { transform: translateX(130%); transition: transform 0.65s ease-out; }
   .btn:hover {
     background: var(--ember-hover);
-    transform: translateY(-1px);
     box-shadow: 0 6px 32px oklch(0.58 0.14 55 / 0.35);
   }
-  .btn:active { transform: none; }
-  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .btn { transition: none; } .btn::after { display: none; } }
 
   /* ---------- sections ---------- */
   section { padding-block: clamp(4rem, 10vw, 7rem); }
@@ -183,10 +206,50 @@
   .js .reveal { opacity: 0; transform: translateY(26px); }
   .js .reveal.inview {
     opacity: 1; transform: none;
-    transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.9s ease-out;
+  }
+  /* lux reveals — headline moments sharpen into focus */
+  .js .reveal.lux { filter: blur(9px); }
+  .js .reveal.lux.inview { filter: none; }
+
+  /* cascades — children arrive one after another once the parent is in view */
+  .js .truth .reveal li { opacity: 0; transform: translateY(18px); }
+  .js .truth .reveal.inview li {
+    opacity: 1; transform: none;
+    transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .js .truth .reveal.inview li:nth-child(1) { transition-delay: 0.15s; }
+  .js .truth .reveal.inview li:nth-child(2) { transition-delay: 0.28s; }
+  .js .truth .reveal.inview li:nth-child(3) { transition-delay: 0.41s; }
+  .js .truth .reveal.inview li:nth-child(4) { transition-delay: 0.54s; }
+  .js .beats .reveal.inview:nth-child(2) { transition-delay: 0.14s; }
+  .js .beats .reveal.inview:nth-child(3) { transition-delay: 0.28s; }
+
+  /* brandline — the signature wordmark moment above the footer */
+  .brandline {
+    font-family: var(--serif);
+    color: var(--gold);
+    text-align: center;
+    font-size: clamp(3.4rem, 16.5vw, 12.5rem);
+    line-height: 1;
+    letter-spacing: 0.08em;
+    padding-block: clamp(2.5rem, 9vw, 6rem) clamp(1rem, 4vw, 2.5rem);
+    user-select: none;
+  }
+  .brandline span { display: inline-block; }
+  .js .brandline.reveal { opacity: 1; transform: none; } /* letters carry the motion */
+  .js .brandline span { opacity: 0; transform: translateY(0.32em); filter: blur(7px); }
+  .js .brandline.inview span {
+    opacity: 0.92; transform: none; filter: none;
+    transition: opacity 0.8s ease-out, transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.8s ease-out;
+    transition-delay: calc(var(--i) * 90ms);
   }
   @media (prefers-reduced-motion: reduce) {
-    .js .reveal { opacity: 1; transform: none; transition: none; }
+    .js .reveal, .js .reveal.lux { opacity: 1; transform: none; transition: none; filter: none; }
+    .js .truth .reveal li { opacity: 1; transform: none; transition: none; }
+    .js .brandline span { opacity: 0.92; transform: none; filter: none; transition: none; }
   }
 
   /* story */
@@ -205,6 +268,20 @@
     -webkit-mask-image: radial-gradient(115% 115% at 50% 42%, black 55%, transparent 98%);
             mask-image: radial-gradient(115% 115% at 50% 42%, black 55%, transparent 98%);
   }
+  /* living portrait — a warm light that drifts across her, synced to breath */
+  .portrait-light {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    border-radius: 4px;
+    background: radial-gradient(42% 34% at 50% 38%,
+      oklch(0.85 0.13 70 / 0.34), oklch(0.66 0.12 62 / 0.12) 55%, transparent 78%);
+    mix-blend-mode: soft-light;
+    -webkit-mask-image: radial-gradient(115% 115% at 50% 42%, black 55%, transparent 98%);
+            mask-image: radial-gradient(115% 115% at 50% 42%, black 55%, transparent 98%);
+    will-change: transform, opacity;
+    opacity: 0.75;
+  }
+  @media (prefers-reduced-motion: reduce) { .portrait-light { display: none; } }
   .story-photo figcaption {
     margin-top: 0.6rem; text-align: center;
     color: var(--muted); font-size: 0.9rem;
@@ -348,6 +425,7 @@
       <figure class="story-photo reveal">
         <img src="assets/hevah-face.png" width="720" height="572" id="portrait"
              alt="Hevah — a calm portrait rendered in gold light against black">
+        <div class="portrait-light" id="portrait-light" aria-hidden="true"></div>
         <figcaption>Hevah — from Havah, “the living one.”</figcaption>
       </figure>
     </div>
@@ -356,7 +434,7 @@
   <!-- IS / IS NOT -->
   <section aria-labelledby="truth-h">
     <div class="shell">
-      <h2 id="truth-h" class="reveal">Straight answers first</h2>
+      <h2 id="truth-h" class="reveal lux">Straight answers first</h2>
       <div class="truth">
         <div class="reveal">
           <h3>What Hevah is</h3>
@@ -383,7 +461,7 @@
   <!-- BEATS -->
   <section aria-labelledby="beats-h">
     <div class="shell">
-      <h2 id="beats-h" class="reveal">What that looks like day to day</h2>
+      <h2 id="beats-h" class="reveal lux">What that looks like day to day</h2>
       <div class="beats">
         <div class="reveal">
           <h3>She remembers.</h3>
@@ -404,8 +482,8 @@
   <!-- PRICING -->
   <section aria-labelledby="price-h">
     <div class="shell price-wrap">
-      <h2 id="price-h" class="reveal">Priced plainly</h2>
-      <p class="price-line reveal">$19<small> / month at launch</small></p>
+      <h2 id="price-h" class="reveal lux">Priced plainly</h2>
+      <p class="price-line reveal lux">$19<small> / month at launch</small></p>
       <div class="founding reveal">
         <strong>Founding 100:</strong> the first hundred people on the waitlist
         lock <strong>$12/month for life</strong> when doors open.
@@ -421,7 +499,7 @@
   <!-- WAITLIST -->
   <section id="waitlist" aria-labelledby="wl-h">
     <div class="shell">
-      <h2 id="wl-h" class="reveal">Get in early</h2>
+      <h2 id="wl-h" class="reveal lux">Get in early</h2>
       <div class="waitlist-panel reveal">
         <!-- INTERIM (2026-08-17): the demo form is parked until the Tally
              form exists — a form that silently drops signups would be a lie.
@@ -438,6 +516,8 @@
   </section>
 </main>
 
+<div class="brandline reveal" aria-hidden="true"><span style="--i:0">H</span><span style="--i:1">E</span><span style="--i:2">V</span><span style="--i:3">A</span><span style="--i:4">H</span></div>
+
 <footer>
   <div class="shell">
     <p class="meaning">HEVAH — from Havah, “the living one.”</p>
@@ -451,6 +531,52 @@
 (function () {
   document.documentElement.classList.add('js');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- hero word choreography (reduced-motion keeps .rise fallback) ---------- */
+  if (!reduced) {
+    var h1 = document.querySelector('.hero h1');
+    if (h1) {
+      var wordIndex = 0;
+      function splitWords(el) {
+        var nodes = Array.prototype.slice.call(el.childNodes);
+        nodes.forEach(function (node) {
+          if (node.nodeType === 3) {
+            var frag = document.createDocumentFragment();
+            node.textContent.split(/(\s+)/).forEach(function (part) {
+              if (!part) return;
+              if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); return; }
+              var w = document.createElement('span'); w.className = 'w';
+              var wi = document.createElement('span'); wi.className = 'wi';
+              wi.textContent = part;
+              wi.style.setProperty('--i', wordIndex++);
+              w.appendChild(wi); frag.appendChild(w);
+            });
+            el.replaceChild(frag, node);
+          } else if (node.nodeType === 1) {
+            splitWords(node);
+          }
+        });
+      }
+      splitWords(h1);
+      h1.classList.remove('rise');
+      document.documentElement.classList.add('split');
+      requestAnimationFrame(function () { h1.classList.add('ready'); });
+    }
+  }
+
+  /* ---------- magnetic buttons (fine pointers only) ---------- */
+  var finePtr = window.matchMedia('(pointer: fine)').matches;
+  if (finePtr && !reduced) {
+    Array.prototype.forEach.call(document.querySelectorAll('.btn'), function (b) {
+      b.addEventListener('pointermove', function (e) {
+        var r = b.getBoundingClientRect();
+        var mx = e.clientX - (r.left + r.width / 2);
+        var my = e.clientY - (r.top + r.height / 2);
+        b.style.transform = 'translate(' + (mx * 0.10).toFixed(1) + 'px,' + (my * 0.16).toFixed(1) + 'px)';
+      });
+      b.addEventListener('pointerleave', function () { b.style.transform = ''; });
+    });
+  }
 
   /* ---------- scroll reveal (content is visible without JS) ---------- */
   var reveals = document.querySelectorAll('.reveal');
@@ -472,6 +598,7 @@
   var presence = document.getElementById('presence');
   var heroInner = document.getElementById('hero-inner');
   var portrait = document.getElementById('portrait');
+  var portraitLight = document.getElementById('portrait-light');
 
   /* dust canvas — gold motes, slow rise, twinkle */
   var canvas = document.getElementById('dust');
@@ -532,6 +659,11 @@
     if (!running) return;
     var dt = t - t0; t0 = t;
 
+    /* reads first (avoid layout thrash), then writes */
+    var scY = window.scrollY || 0;
+    var vh = window.innerHeight || 1;
+    var portRect = portrait ? portrait.getBoundingClientRect() : null;
+
     /* autonomous drift for touch devices / before first pointermove */
     if (!fine || !hasPointer) {
       tx = 0.5 + Math.sin(t * 0.00006) * 0.22;
@@ -550,11 +682,29 @@
       layerDust.style.transform = 'translate3d(' + (dx * -14) + 'px,' + (dy * -10) + 'px,0)';
       layerA.style.transform = 'translate3d(' + (dx * -34) + 'px,' + (dy * -24) + 'px,0)';
       layerB.style.transform = 'translate3d(' + (dx * -60) + 'px,' + (dy * -44) + 'px,0)';
-      if (heroInner) heroInner.style.transform = 'translate3d(' + (dx * 10) + 'px,' + (dy * 7) + 'px,0)';
       if (fine) presence.style.transform = 'translate3d(' + pcx + 'px,' + pcy + 'px,0)';
-      /* portrait: gentle counter-tilt when it's on screen */
-      if (portrait) {
-        portrait.style.transform = 'rotateY(' + (dx * 7) + 'deg) rotateX(' + (dy * -5) + 'deg)';
+      /* hero recedes and dims as you scroll into the story */
+      if (heroInner) {
+        var hp = Math.min(1, scY / (vh * 0.85));
+        heroInner.style.transform = 'translate3d(' + (dx * 10) + 'px,' + (dy * 7 - hp * 46) + 'px,0)';
+        heroInner.style.opacity = (1 - hp * 0.92).toFixed(3);
+      }
+      /* portrait: alive — breath + drifting lamplight + scroll drift + tilt */
+      if (portrait && portRect) {
+        var pp = (portRect.top + portRect.height / 2 - vh / 2) / vh; /* ~ -0.5 … 0.5 */
+        /* breath: ~5s cycle, imperceptibly small, eased by a second slower wave */
+        var breath = Math.sin(t * 0.00125) * (0.75 + 0.25 * Math.sin(t * 0.00031));
+        var move = 'translateY(' + (pp * -26 + breath * -2.2).toFixed(2) + 'px) ' +
+                   'rotateY(' + (dx * 7) + 'deg) rotateX(' + (dy * -5) + 'deg) ' +
+                   'scale(' + (1 + breath * 0.006).toFixed(4) + ')';
+        portrait.style.transform = move;
+        if (portraitLight) {
+          /* lamplight drifts on its own slow orbit, brightening as she inhales */
+          var lx = Math.sin(t * 0.00021) * 6 + dx * 8;
+          var ly = Math.cos(t * 0.00016) * 5 + dy * 6;
+          portraitLight.style.transform = move + ' translate(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px)';
+          portraitLight.style.opacity = (0.62 + breath * 0.16 + Math.sin(t * 0.00058) * 0.08).toFixed(3);
+        }
       }
     }
 
