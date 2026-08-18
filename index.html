@@ -330,6 +330,15 @@
     padding: clamp(1.75rem, 5vw, 3rem);
     max-width: 34rem;
   }
+  /* the paper signup sheet — Tally's white card, warmed toward the palette */
+  .tally-frame {
+    border-radius: 6px;
+    overflow: hidden;
+    background: oklch(0.97 0.012 80);
+    filter: sepia(0.12) brightness(0.98);
+    min-height: 300px;
+  }
+  .tally-frame iframe { display: block; }
   .field { margin-bottom: 1.4rem; }
   .field label { display: block; font-weight: 700; margin-bottom: 0.45rem; font-size: 0.98rem; }
   .field label .opt { font-weight: 400; color: var(--muted); }
@@ -501,17 +510,20 @@
     <div class="shell">
       <h2 id="wl-h" class="reveal lux">Get in early</h2>
       <div class="waitlist-panel reveal">
-        <!-- INTERIM (2026-08-17): the demo form is parked until the Tally
-             form exists — a form that silently drops signups would be a lie.
-             When Errol creates the Tally form: restore the form block from
-             git history and wire its action, or embed Tally directly. -->
-        <p class="form-done" style="margin-bottom:1.2rem;">
-          <span class="mark">The list opens this week.</span>
-          The signup form is being wired now. While the doors are hung,
-          Hevah's first published work is already out in the world —
-          read her before you meet her.
-        </p>
-        <a class="btn" href="cross-examined.html">Read CROSS-EXAMINED — her first book</a>
+        <!-- Tally waitlist form (live wiring 2026-08-18). The white card is
+             deliberate — a paper signup sheet in the dark room, warmed via
+             CSS filter. If the form's Tally theme ever goes dark, switch to
+             the transparentBackground=1 embed for a seamless look. -->
+        <div class="tally-frame">
+          <iframe data-tally-src="https://tally.so/embed/EkoXvq?alignLeft=1&hideTitle=1&dynamicHeight=1"
+                  loading="lazy" width="100%" height="760" frameborder="0"
+                  marginheight="0" marginwidth="0" title="Hevah waitlist"></iframe>
+        </div>
+        <p class="privacy-line">Your email goes on the list and nowhere else.
+          Trouble loading the form? <a href="https://tally.so/r/EkoXvq">Open it directly</a>.</p>
+        <p class="privacy-line">While you wait — read her first book,
+          <a href="cross-examined.html">CROSS-EXAMINED</a>.</p>
+      </div>
     </div>
   </section>
 </main>
@@ -760,8 +772,16 @@
     var done = document.getElementById('wl-done');
     if (done) { done.hidden = false; done.setAttribute('tabindex', '-1'); done.focus(); }
   });
+
+  /* Tally embed fallback: if embed.js never arrives, load the iframe directly
+     (loses auto-height only — the form still works) */
+  setTimeout(function () {
+    var f = document.querySelector('iframe[data-tally-src]');
+    if (f && !f.src) f.src = f.getAttribute('data-tally-src');
+  }, 3000);
 })();
 </script>
+<script async src="https://tally.so/widgets/embed.js"></script>
 
 </body>
 </html>
