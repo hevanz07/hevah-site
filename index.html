@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- ============================================================
-     HEVAH — validation landing page (immersive build + aura pass)
+     HEVAH — validation landing page (immersive + aura + 3D field)
      STATUS: LIVE at hevah.ai (GitHub Pages, hevanz07/hevah-site).
      Any change deploys ONLY on Errol's explicit GO (push = publish).
      Waitlist form still parked — wire Tally per HEVAH-PLAN.md
@@ -49,6 +49,10 @@
 
   h1, h2, h3 { font-family: var(--serif); font-weight: 400; text-wrap: balance; }
   p { text-wrap: pretty; }
+  /* the content always wins against the field — a soft dark halo on type */
+  h1, h2, .lede, .price-line {
+    text-shadow: 0 2px 26px oklch(0.07 0 0 / 0.95), 0 0 10px oklch(0.07 0 0 / 0.7);
+  }
 
   a { color: var(--gold); }
   :focus-visible {
@@ -202,11 +206,23 @@
   section + section { border-top: 1px solid var(--line); }
   h2 { font-size: clamp(1.7rem, 4vw, 2.4rem); line-height: 1.2; margin-bottom: 2.25rem; }
 
-  /* scroll reveal — JS-gated pre-hide so no-JS users see everything */
-  .js .reveal { opacity: 0; transform: translateY(26px); }
+  /* scroll reveal — JS-gated pre-hide so no-JS users see everything.
+     Blocks now stand up out of the page plane (subtle 3D) as they enter. */
+  .js .reveal {
+    opacity: 0;
+    transform: perspective(1100px) translateY(30px) rotateX(7deg);
+    transform-origin: 50% 88%;
+  }
   .js .reveal.inview {
     opacity: 1; transform: none;
-    transition: opacity 0.9s ease-out, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transition: opacity 0.9s ease-out, transform 1.05s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.9s ease-out;
+  }
+  /* card tilt targets — JS drives the transform on fine pointers;
+     their transform transition stays quick so the tilt tracks the hand */
+  .founding, .waitlist-panel { will-change: transform; }
+  .js .founding.inview, .js .waitlist-panel.inview {
+    transition: opacity 0.9s ease-out, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
                 filter 0.9s ease-out;
   }
   /* lux reveals — headline moments sharpen into focus */
@@ -612,12 +628,145 @@
   var portrait = document.getElementById('portrait');
   var portraitLight = document.getElementById('portrait-light');
 
-  /* dust canvas — gold motes, slow rise, twinkle */
+  /* ===== the field: a 3D WebGL ember universe you travel through =====
+     Scroll = forward flight through the volume; pointer = eased look-around.
+     Three populations: ambient cloud, a golden helix strand, rising embers.
+     All motion computed in the vertex shader (zero per-frame CPU per particle).
+     Fallback: the original 2D dust if WebGL is unavailable. */
   var canvas = document.getElementById('dust');
-  var ctx = canvas.getContext('2d');
-  var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  var dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+  var field = null;   /* WebGL engine */
+  var ctx = null;     /* 2D fallback */
   var motes = [];
   var MOTE_N = 110;
+
+  function initField() {
+    var gl;
+    try { gl = canvas.getContext('webgl', { alpha: true, antialias: false, depth: false, premultipliedAlpha: true }); }
+    catch (e) { gl = null; }
+    if (!gl) return null;
+
+    var VSH = [
+      'attribute vec4 a_seed;',
+      'uniform float u_time, u_scroll, u_aspect, u_dpr, u_fade;',
+      'uniform vec2 u_look;',
+      'varying float v_a, v_w;',
+      'const float DEPTH = 64.0;',
+      'void main() {',
+      '  float kind = a_seed.w;',
+      '  vec3 p;',
+      '  if (kind < 0.60) {',                                     /* ambient cloud */
+      '    p = vec3((a_seed.x - 0.5) * 26.0, (a_seed.y - 0.5) * 15.0, a_seed.z * DEPTH);',
+      '    p.x += sin(u_time * 0.12 + a_seed.z * 37.0) * 0.4;',
+      '    p.y += cos(u_time * 0.10 + a_seed.x * 41.0) * 0.35;',
+      '  } else if (kind < 0.84) {',                              /* the golden strand */
+      '    float z = a_seed.z * DEPTH;',
+      '    float ang = z * 0.5 + a_seed.y * 0.9 + u_time * 0.06;',
+      '    float rad = 3.4 + a_seed.y * 1.6 + sin(u_time * 0.18 + a_seed.x * 6.2832) * 0.4;',
+      '    p = vec3(cos(ang) * rad + 5.5, sin(ang) * rad * 0.6, z);',
+      '  } else {',                                               /* rising embers */
+      '    float rise = fract(a_seed.y + u_time * 0.017 * (0.5 + a_seed.x));',
+      '    p = vec3((a_seed.x - 0.5) * 22.0, -7.0 + rise * 15.0, a_seed.z * DEPTH);',
+      '  }',
+      '  float camZ = u_scroll * DEPTH + u_time * 0.35;',         /* scroll flies the camera */
+      '  float rz = mod(p.z - camZ, DEPTH);',
+      '  vec3 rel = vec3(p.x, p.y, rz);',
+      '  rel.x -= u_look.x * (rz * 0.5 + 2.0);',                  /* pointer look-around */
+      '  rel.y += u_look.y * (rz * 0.35 + 1.5);',
+      '  float persp = 1.0 / (0.4 + rz * 0.17);',
+      '  gl_Position = vec4(rel.x * persp / u_aspect, rel.y * persp, 0.0, 1.0);',
+      '  float baseSize = kind >= 0.84 ? 2.2 : (kind >= 0.60 ? 1.9 : 1.5);',
+      '  gl_PointSize = clamp(baseSize * persp * 24.0 * u_dpr, 1.0, 17.0 * u_dpr);',
+      '  float tw = 0.6 + 0.4 * sin(u_time * (1.2 + a_seed.x * 2.4) + a_seed.y * 40.0);',
+      '  float far = smoothstep(DEPTH, DEPTH * 0.5, rz);',
+      '  float near = smoothstep(0.35, 2.6, rz);',                /* melt the too-close blobs */
+      '  v_a = tw * far * near * u_fade;',
+      '  v_w = a_seed.x;',
+      '}'
+    ].join('\n');
+    var FSH = [
+      'precision mediump float;',
+      'varying float v_a, v_w;',
+      'void main() {',
+      '  vec2 d = gl_PointCoord - 0.5;',
+      '  float disc = smoothstep(0.25, 0.02, dot(d, d));',
+      '  vec3 gold = mix(vec3(1.0, 0.60, 0.20), vec3(1.0, 0.88, 0.56), v_w);',
+      '  float i = disc * v_a * 0.52;',
+      '  gl_FragColor = vec4(gold * i, i);',                      /* premultiplied, additive */
+      '}'
+    ].join('\n');
+
+    function compile(type, src) {
+      var s = gl.createShader(type);
+      gl.shaderSource(s, src); gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) return null;
+      return s;
+    }
+    var vs = compile(gl.VERTEX_SHADER, VSH);
+    var fs = compile(gl.FRAGMENT_SHADER, FSH);
+    if (!vs || !fs) return null;
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+    gl.useProgram(prog);
+
+    var N = (window.innerWidth < 768) ? 2600 : 4600;
+    var seeds = new Float32Array(N * 4);
+    for (var i = 0; i < N * 4; i++) seeds[i] = Math.random();
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, seeds, gl.STATIC_DRAW);
+    var aSeed = gl.getAttribLocation(prog, 'a_seed');
+    gl.enableVertexAttribArray(aSeed);
+    gl.vertexAttribPointer(aSeed, 4, gl.FLOAT, false, 0, 0);
+
+    var U = {};
+    ['u_time', 'u_scroll', 'u_aspect', 'u_dpr', 'u_fade', 'u_look'].forEach(function (n) {
+      U[n] = gl.getUniformLocation(prog, n);
+    });
+    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ONE);
+    gl.clearColor(0, 0, 0, 0);
+
+    var lost = false;
+    canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); lost = true; }, false);
+    canvas.addEventListener('webglcontextrestored', function () { lost = false; }, false);
+
+    function resize() {
+      canvas.width = Math.round(canvas.clientWidth * dpr);
+      canvas.height = Math.round(canvas.clientHeight * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform1f(U.u_aspect, canvas.width / Math.max(1, canvas.height));
+      gl.uniform1f(U.u_dpr, dpr);
+    }
+    resize();
+
+    return {
+      render: function (tSec, scroll, lookX, lookY) {
+        if (lost) return;
+        gl.uniform1f(U.u_time, tSec);
+        gl.uniform1f(U.u_scroll, scroll);
+        gl.uniform1f(U.u_fade, Math.min(1, tSec / 1.5));
+        gl.uniform2f(U.u_look, lookX, lookY);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.POINTS, 0, N);
+      },
+      resize: resize,
+      count: N,
+      /* verification: count lit pixels in a sample block */
+      sample: function () {
+        var px = new Uint8Array(64 * 64 * 4);
+        gl.readPixels(Math.floor(canvas.width / 2) - 32, Math.floor(canvas.height / 2) - 32,
+                      64, 64, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        var lit = 0;
+        for (var i = 0; i < px.length; i += 4) if (px[i] + px[i + 1] + px[i + 2] > 8) lit++;
+        return lit;
+      }
+    };
+  }
+
+  /* 2D dust fallback (original engine) */
   function sizeCanvas() {
     canvas.width = Math.round(canvas.clientWidth * dpr);
     canvas.height = Math.round(canvas.clientHeight * dpr);
@@ -636,8 +785,31 @@
       });
     }
   }
-  sizeCanvas(); seedMotes();
-  window.addEventListener('resize', function () { sizeCanvas(); seedMotes(); });
+  field = initField();
+  if (!field) {
+    ctx = canvas.getContext('2d');
+    sizeCanvas(); seedMotes();
+  }
+  window.addEventListener('resize', function () {
+    if (field) { field.resize(); }
+    else { sizeCanvas(); seedMotes(); }
+  });
+
+  /* smoothed scroll progress for the camera */
+  var scCur = 0;
+
+  /* card tilt — pricing card and waitlist panel lean toward the cursor */
+  if (window.matchMedia('(pointer: fine)').matches && !reduced) {
+    Array.prototype.forEach.call(document.querySelectorAll('.founding, .waitlist-panel'), function (card) {
+      card.addEventListener('pointermove', function (e) {
+        var r = card.getBoundingClientRect();
+        var nx = (e.clientX - r.left) / r.width - 0.5;
+        var ny = (e.clientY - r.top) / r.height - 0.5;
+        card.style.transform = 'perspective(900px) rotateY(' + (nx * 3.2).toFixed(2) + 'deg) rotateX(' + (ny * -2.6).toFixed(2) + 'deg)';
+      });
+      card.addEventListener('pointerleave', function () { card.style.transform = ''; });
+    });
+  }
 
   /* pointer state, eased */
   var fine = window.matchMedia('(pointer: fine)').matches;
@@ -690,8 +862,9 @@
 
     if (!reduced) {
       var dx = cx - 0.5, dy = cy - 0.5;
-      /* parallax: deeper = slower; layers move WITH the eye */
-      layerDust.style.transform = 'translate3d(' + (dx * -14) + 'px,' + (dy * -10) + 'px,0)';
+      /* parallax: deeper = slower; layers move WITH the eye.
+         In 3D-field mode the shader owns the dust layer's motion (u_look). */
+      if (!field) layerDust.style.transform = 'translate3d(' + (dx * -14) + 'px,' + (dy * -10) + 'px,0)';
       layerA.style.transform = 'translate3d(' + (dx * -34) + 'px,' + (dy * -24) + 'px,0)';
       layerB.style.transform = 'translate3d(' + (dx * -60) + 'px,' + (dy * -44) + 'px,0)';
       if (fine) presence.style.transform = 'translate3d(' + pcx + 'px,' + pcy + 'px,0)';
@@ -720,21 +893,29 @@
       }
     }
 
-    /* dust */
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (var i = 0; i < motes.length; i++) {
-      var m = motes[i];
-      m.y -= m.vy * (dt || 16) / 16;
-      m.x += m.vx * (dt || 16) / 16;
-      m.tw += m.tws * (dt || 16) / 16;
-      if (m.y < -4) { m.y = canvas.height + 4; m.x = Math.random() * canvas.width; }
-      if (m.x < -4) m.x = canvas.width + 4;
-      if (m.x > canvas.width + 4) m.x = -4;
-      var a = 0.10 + Math.abs(Math.sin(m.tw)) * 0.32;
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, m.r, 0, 6.2832);
-      ctx.fillStyle = 'rgba(224, 173, 96,' + a.toFixed(3) + ')';
-      ctx.fill();
+    /* the field: scroll flies the camera; pointer steers the look */
+    if (field) {
+      var doc = document.documentElement;
+      var maxScroll = Math.max(1, doc.scrollHeight - vh);
+      scCur += (scY / maxScroll - scCur) * 0.05;
+      field.render(t * 0.001, scCur * 2.0, (cx - 0.5), (cy - 0.5));
+    } else if (ctx) {
+      /* 2D dust fallback */
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (var i = 0; i < motes.length; i++) {
+        var m = motes[i];
+        m.y -= m.vy * (dt || 16) / 16;
+        m.x += m.vx * (dt || 16) / 16;
+        m.tw += m.tws * (dt || 16) / 16;
+        if (m.y < -4) { m.y = canvas.height + 4; m.x = Math.random() * canvas.width; }
+        if (m.x < -4) m.x = canvas.width + 4;
+        if (m.x > canvas.width + 4) m.x = -4;
+        var a = 0.10 + Math.abs(Math.sin(m.tw)) * 0.32;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.r, 0, 6.2832);
+        ctx.fillStyle = 'rgba(224, 173, 96,' + a.toFixed(3) + ')';
+        ctx.fill();
+      }
     }
     requestAnimationFrame(tick);
   }
@@ -742,11 +923,19 @@
   window.__hevahEnv = {
     setTarget: function (x, y) { tx = x; ty = y; hasPointer = true; fine = true; px = x * window.innerWidth; py = y * window.innerHeight; },
     step: function (t) { running = true; tick(t); },
-    state: function () { return { cx: cx, cy: cy, tx: tx, ty: ty, motes: motes.length }; }
+    state: function () {
+      return { cx: cx, cy: cy, tx: tx, ty: ty, scroll: scCur,
+               mode: field ? 'webgl3d' : 'dust2d',
+               particles: field ? field.count : motes.length };
+    },
+    sample: function () { return field ? field.sample() : -1; }
   };
   if (!reduced) {
     requestAnimationFrame(tick);
-  } else {
+  } else if (field) {
+    /* reduced motion: one static, calm frame of the field */
+    field.render(0.8, 0, 0, 0);
+  } else if (ctx) {
     /* reduced motion: one static, calm frame of dust */
     for (var i = 0; i < motes.length; i++) {
       var m = motes[i];
