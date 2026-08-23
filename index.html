@@ -279,6 +279,13 @@
       linear-gradient(180deg, oklch(0.07 0 0 / 0.72) 0%, transparent 24%, transparent 70%, oklch(0.07 0 0 / 0.82) 100%),
       oklch(0.07 0 0 / 0.10);
   }
+  @media (orientation: portrait) {
+    /* phones: the plain cover crop already frames her full-length —
+       the extra desktop zoom would cut her head and feet off */
+    #orbit-bg video { transform: none; }
+    /* the wake film letterboxes on black instead of cropping her out */
+    #intro video { object-fit: contain; }
+  }
   @media (prefers-reduced-motion: reduce) {
     #orbit-bg { display: none; }
     #intro { display: none; }
@@ -1169,10 +1176,15 @@
         var maxScY = Math.max(1, docEl.scrollHeight - vh);
         var op = Math.min(1, Math.max(0, scY / maxScY));
         /* prime once: a muted play/pause guarantees the browser presents frames */
-        if (!orbitPrimed && orbitFilm.readyState >= 2) {
+        if (!orbitPrimed) {
+          /* prime immediately — iPhones refuse to LOAD video data until
+             playback is poked, so waiting for readyState deadlocks there */
           orbitPrimed = true;
           var opp = orbitFilm.play();
-          if (opp && opp.then) opp.then(function () { orbitFilm.pause(); }).catch(function () {});
+          if (opp && opp.then) {
+            opp.then(function () { orbitFilm.pause(); })
+               .catch(function () { orbitPrimed = false; }); /* retry next frame */
+          }
         }
         /* eased follow; never issue a seek while one is in flight —
            back-to-back seeks cancel each other and freeze the frame */
