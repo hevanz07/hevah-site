@@ -131,10 +131,159 @@
   /* ---------- hero ---------- */
   .hero {
     position: relative;
-    min-height: 82vh;
+    min-height: 88vh;
     display: flex; align-items: center;
+    overflow: clip;
   }
-  .hero-inner { max-width: 44rem; padding-block: 4rem; will-change: transform; }
+  .hero-shell { display: block; width: 100%; }
+  .hero-inner { max-width: 44rem; padding-block: 4rem; will-change: transform; position: relative; z-index: 2; }
+
+  /* her — the cinema. A rendered film IS the hero background. */
+  .hero-cinema {
+    position: absolute; inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .hero-cinema video,
+  .hero-cinema .cinema-still {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: 66% center; /* keep her on the right third */
+  }
+  .hero-cinema .cinema-still { display: none; }
+  .hero-cinema.still video { display: none; }
+  .hero-cinema.still .cinema-still { display: block; }
+  /* legibility veil: darkness rolls in from the left, where the words live */
+  .hero-cinema::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(90deg, oklch(0.07 0 0 / 0.92) 0%, oklch(0.07 0 0 / 0.55) 38%, oklch(0.07 0 0 / 0.08) 62%, transparent 80%),
+      linear-gradient(180deg, oklch(0.07 0 0 / 0.5) 0%, transparent 22%, transparent 72%, oklch(0.07 0 0 / 0.95) 100%);
+  }
+  @media (max-width: 899px) {
+    .hero-cinema video, .hero-cinema .cinema-still { object-position: 62% center; }
+    .hero-cinema::after {
+      background:
+        linear-gradient(180deg, oklch(0.07 0 0 / 0.6) 0%, oklch(0.07 0 0 / 0.25) 30%, oklch(0.07 0 0 / 0.55) 70%, oklch(0.07 0 0 / 0.95) 100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-cinema video { display: none; }
+    .hero-cinema .cinema-still { display: block; }
+  }
+
+  /* ---------- the intro: she wakes before the page opens ---------- */
+  #intro {
+    position: fixed; inset: 0;
+    z-index: 60;
+    background: oklch(0.05 0 0);
+    transition: opacity 0.9s ease-out;
+  }
+  #intro.gone { opacity: 0; pointer-events: none; }
+  #intro video {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+  }
+  #intro-skip {
+    position: absolute; right: 1.5rem; bottom: 1.4rem;
+    background: none;
+    border: 1px solid oklch(0.35 0.02 68);
+    color: var(--muted);
+    font: inherit; font-size: 0.85rem;
+    padding: 0.45rem 1.15rem;
+    border-radius: 999px;
+    cursor: pointer;
+    animation: rise 0.6s ease-out 1.8s both;
+  }
+  #intro-skip:hover { color: var(--ink); border-color: var(--muted); }
+  #intro-gate {
+    position: absolute; inset: 0; z-index: 2;
+    background: oklch(0.05 0 0);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 0.4rem;
+    transition: opacity 0.7s ease-out;
+  }
+  #intro-gate.gone-gate { opacity: 0; pointer-events: none; }
+  .gate-mark {
+    font-family: var(--serif);
+    color: var(--gold);
+    font-size: clamp(2.6rem, 9vw, 5rem);
+    letter-spacing: 0.18em;
+    animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .gate-sub {
+    color: var(--muted);
+    font-size: 1.02rem;
+    margin-bottom: 2.2rem;
+    animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+  #intro-enter {
+    font-family: var(--sans); font-weight: 700; font-size: 1.08rem;
+    color: oklch(0.99 0 0);
+    background: var(--ember);
+    border: 0; border-radius: 6px;
+    padding: 0.95rem 2.6rem;
+    cursor: pointer;
+    animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+  }
+  #intro-enter:hover { background: var(--ember-hover); }
+  #intro-quiet {
+    background: none; border: 0;
+    color: var(--muted);
+    font: inherit; font-size: 0.88rem;
+    margin-top: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+    animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+  }
+  #intro-quiet:hover { color: var(--ink); }
+  #intro-sound {
+    position: absolute; left: 1.5rem; bottom: 1.4rem;
+    background: none;
+    border: 1px solid oklch(0.35 0.02 68);
+    color: var(--muted);
+    font: inherit; font-size: 0.85rem;
+    padding: 0.45rem 1.15rem;
+    border-radius: 999px;
+    cursor: pointer;
+    animation: rise 0.6s ease-out 1.2s both;
+  }
+  #intro-sound:hover { color: var(--ink); border-color: var(--muted); }
+  #intro-sound.on { color: var(--gold); border-color: var(--gold-deep); }
+  html.intro-hold { overflow: hidden; }
+  .js.intro-hold .rise { animation-play-state: paused; }
+  .js.intro-hold .hero h1.ready .wi { animation-play-state: paused; }
+
+  /* ---------- her orbit: the living background of the page ---------- */
+  #orbit-bg {
+    position: fixed; inset: 0;
+    z-index: var(--z-env);
+    pointer-events: none;
+    opacity: 0;
+    will-change: opacity;
+  }
+  #orbit-bg video {
+    width: 100%; height: 100%;
+    object-fit: cover; object-position: center;
+    /* she fills the frame — full length, larger than life */
+    transform: scale(1.38);
+    transform-origin: 50% 52%;
+    will-change: transform;
+  }
+  /* scrims keep the words readable over her */
+  #orbit-bg::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, oklch(0.07 0 0 / 0.72) 0%, transparent 24%, transparent 70%, oklch(0.07 0 0 / 0.82) 100%),
+      oklch(0.07 0 0 / 0.10);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #orbit-bg { display: none; }
+    #intro { display: none; }
+  }
+
   .hero h1 {
     font-size: clamp(2.5rem, 7.5vw, 4.4rem);
     line-height: 1.08;
@@ -384,6 +533,21 @@
 </head>
 <body>
 
+<!-- INTRO — she wakes before the page opens (once per session) -->
+<div id="intro" aria-hidden="true">
+  <video id="intro-film" muted playsinline preload="auto" poster="assets/hevah-wake-poster.jpg">
+    <source src="assets/hevah-wake-sound.mp4?v=3" type="video/mp4">
+  </video>
+  <div id="intro-gate">
+    <p class="gate-mark">HEVAH</p>
+    <p class="gate-sub">The one in your corner.</p>
+    <button id="intro-enter" type="button">&#9654;&#xFE0E; Enter</button>
+    <button id="intro-quiet" type="button">Enter without sound</button>
+  </div>
+  <button id="intro-sound" type="button">&#128266; Sound on</button>
+  <button id="intro-skip" type="button">Skip</button>
+</div>
+
 <!-- THE ENVIRONMENT — she notices you; the room responds -->
 <div id="env" aria-hidden="true">
   <div class="layer" id="layer-dust"><canvas id="dust"></canvas></div>
@@ -391,6 +555,13 @@
   <div class="layer glow-b" id="layer-b"></div>
   <div id="presence"></div>
   <div id="grain"></div>
+
+<!-- HER — the living background: she rotates with your scroll -->
+<div id="orbit-bg" aria-hidden="true">
+  <video id="orbit-film" muted playsinline preload="auto" poster="assets/hevah-turn-poster.jpg">
+    <source src="assets/hevah-orbit-scrub.mp4?v=3" type="video/mp4">
+  </video>
+</div>
 </div>
 
 <header class="shell top">
@@ -401,19 +572,29 @@
 <main>
   <!-- HERO -->
   <section class="hero" aria-label="Introduction">
-    <div class="shell hero-inner" id="hero-inner">
-      <h1 class="rise">The one <em>in your corner.</em></h1>
-      <p class="lede rise d1">
-        Hevah is an AI companion for people who carry a lot and say
-        little. A private memory that's yours alone, check-ins that come
-        before you ask, and one steady presence that doesn't reset when
-        the tab closes. Built by a combat veteran who needed exactly that,
-        and built her himself.
-      </p>
-      <div class="cta-row rise d2">
-        <a class="btn" href="#waitlist">Join the waitlist</a>
-        <span class="quiet">The first 100 lock the founding rate for three years.</span>
+    <div class="shell hero-shell">
+      <div class="hero-inner" id="hero-inner">
+        <h1 class="rise">The one <em>in your corner.</em></h1>
+        <p class="lede rise d1">
+          Hevah is an AI companion for people who carry a lot and say
+          little. A private memory that's yours alone, check-ins that come
+          before you ask, and one steady presence that doesn't reset when
+          the tab closes. Built by a combat veteran who needed exactly that,
+          and built her himself.
+        </p>
+        <div class="cta-row rise d2">
+          <a class="btn" href="#waitlist">Join the waitlist</a>
+          <span class="quiet">The first 100 lock the founding rate for three years.</span>
+        </div>
       </div>
+    </div>
+    <div class="hero-cinema" id="hero-cinema" aria-hidden="true">
+      <!-- the eternal ambient loop — begins the moment the intro lifts -->
+      <video id="cinema" muted loop playsinline
+             poster="assets/hevah-cinema-poster.jpg" preload="auto">
+        <source src="assets/hevah-cinema-web.mp4?v=3" type="video/mp4">
+      </video>
+      <img class="cinema-still" src="assets/hevah-cinema-poster.jpg" alt="">
     </div>
   </section>
 
@@ -448,8 +629,8 @@
         <p class="sign">Errol · founder, veteran, father</p>
       </div>
       <figure class="story-photo reveal">
-        <img src="assets/hevah-face.png" width="720" height="572" id="portrait"
-             alt="Hevah, a calm portrait rendered in gold light against black">
+        <img src="assets/hevah-portrait-lines.jpg?v=3" width="720" height="572" id="portrait"
+             alt="Hevah, a photoreal portrait, golden light veins tracing her face, a halo of light rings behind her">
         <div class="portrait-light" id="portrait-light" aria-hidden="true"></div>
         <figcaption>Hevah, from Havah: “the living one.”</figcaption>
       </figure>
@@ -560,6 +741,86 @@
   document.documentElement.classList.add('js');
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* the intro film: she wakes before the page opens (once per session),
+     then the hero's ambient loop takes over. Any failure or reduced motion
+     skips straight to the page. */
+  (function () {
+    var intro = document.getElementById('intro');
+    var introFilm = document.getElementById('intro-film');
+    var skipBtn = document.getElementById('intro-skip');
+    var wrap = document.getElementById('hero-cinema');
+    var loop = document.getElementById('cinema');
+    var seen = false;
+    try { seen = sessionStorage.getItem('hevah-intro') === '1'; } catch (e) {}
+
+    function heroStart() {
+      document.documentElement.classList.remove('intro-hold');
+      if (!loop) return;
+      loop.play && loop.play().catch(function () {});
+      setTimeout(function () {
+        if (loop.readyState < 2 || loop.paused) {
+          loop.play().catch(function () { if (wrap) wrap.classList.add('still'); });
+        }
+      }, 3000);
+    }
+    if (loop) loop.addEventListener('error', function () { if (wrap) wrap.classList.add('still'); });
+
+    if (!intro || !introFilm || reduced || seen) {
+      if (intro) intro.remove();
+      heroStart();
+      return;
+    }
+    document.documentElement.classList.add('intro-hold');
+    var finished = false;
+    function finish() {
+      if (finished) return;
+      finished = true;
+      try { sessionStorage.setItem('hevah-intro', '1'); } catch (e) {}
+      intro.classList.add('gone');
+      heroStart();
+      setTimeout(function () { intro.remove(); }, 1000);
+    }
+    introFilm.addEventListener('ended', finish);
+    introFilm.addEventListener('error', finish);
+    /* lift the veil just before the last frame so the hero appears mid-motion */
+    introFilm.addEventListener('timeupdate', function () {
+      if (introFilm.duration && introFilm.currentTime > introFilm.duration - 0.45) finish();
+    });
+    if (skipBtn) skipBtn.addEventListener('click', finish);
+    /* the gate: one click opens the door — and that click is the user
+       gesture that lets the film start with sound in every browser */
+    var gate = document.getElementById('intro-gate');
+    var soundBtnEl = document.getElementById('intro-sound');
+    function markSoundOn() {
+      if (soundBtnEl) { soundBtnEl.classList.add('on'); soundBtnEl.innerHTML = '&#128266; Sound is on'; }
+    }
+    if (soundBtnEl) soundBtnEl.addEventListener('click', function () {
+      introFilm.muted = false;
+      introFilm.volume = 1;
+      markSoundOn();
+    });
+    function beginFilm(withSound) {
+      if (gate) {
+        gate.classList.add('gone-gate');
+        setTimeout(function () { gate.remove(); }, 800);
+      }
+      introFilm.muted = !withSound;
+      if (withSound) { introFilm.volume = 1; markSoundOn(); }
+      var p = introFilm.play ? introFilm.play() : null;
+      if (p && p.catch) p.catch(function () {
+        introFilm.muted = true;
+        introFilm.play && introFilm.play().catch(function () { finish(); });
+      });
+      /* watchdog armed only after the choice — the film must actually run */
+      setTimeout(function () { if (introFilm.currentTime === 0) finish(); }, 3000);
+    }
+    var enterBtn = document.getElementById('intro-enter');
+    var quietBtn = document.getElementById('intro-quiet');
+    if (enterBtn) enterBtn.addEventListener('click', function () { beginFilm(true); });
+    if (quietBtn) quietBtn.addEventListener('click', function () { beginFilm(false); });
+    if (!enterBtn) beginFilm(false); /* markup fallback: never trap the page */
+  })();
+
   /* ---------- hero word choreography (reduced-motion keeps .rise fallback) ---------- */
   if (!reduced) {
     var h1 = document.querySelector('.hero h1');
@@ -627,6 +888,17 @@
   var heroInner = document.getElementById('hero-inner');
   var portrait = document.getElementById('portrait');
   var portraitLight = document.getElementById('portrait-light');
+  var orbitBg = document.getElementById('orbit-bg');
+  var orbitFilm = document.getElementById('orbit-film');
+  var orbitPrimed = false;
+  var orbitScrub = 0;
+  if (orbitFilm) {
+    orbitFilm.addEventListener('error', function () {
+      if (orbitBg) orbitBg.style.display = 'none';
+    });
+  }
+
+
 
   /* ===== the field: a 3D WebGL ember universe you travel through =====
      Scroll = forward flight through the volume; pointer = eased look-around.
@@ -890,6 +1162,30 @@
           portraitLight.style.transform = move + ' translate(' + lx.toFixed(1) + 'px,' + ly.toFixed(1) + 'px)';
           portraitLight.style.opacity = (0.62 + breath * 0.16 + Math.sin(t * 0.00058) * 0.08).toFixed(3);
         }
+      }
+      /* she is the page's background: full 360 orbit over the whole scroll */
+      if (orbitFilm && orbitBg) {
+        var docEl = document.documentElement;
+        var maxScY = Math.max(1, docEl.scrollHeight - vh);
+        var op = Math.min(1, Math.max(0, scY / maxScY));
+        /* prime once: a muted play/pause guarantees the browser presents frames */
+        if (!orbitPrimed && orbitFilm.readyState >= 2) {
+          orbitPrimed = true;
+          var opp = orbitFilm.play();
+          if (opp && opp.then) opp.then(function () { orbitFilm.pause(); }).catch(function () {});
+        }
+        /* eased follow; never issue a seek while one is in flight —
+           back-to-back seeks cancel each other and freeze the frame */
+        if (orbitFilm.readyState >= 2 && orbitFilm.duration && !orbitFilm.seeking) {
+          var oTarget = op * (orbitFilm.duration - 0.06);
+          orbitScrub += (oTarget - orbitScrub) * 0.16;
+          if (Math.abs(orbitFilm.currentTime - orbitScrub) > 0.02) {
+            orbitFilm.currentTime = orbitScrub;
+          }
+        }
+        /* she appears as the hero cinema scrolls away, then stays */
+        var oFade = Math.min(1, Math.max(0, (scY - vh * 0.55) / (vh * 0.5)));
+        orbitBg.style.opacity = (oFade * 0.74).toFixed(3);
       }
     }
 
