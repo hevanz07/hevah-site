@@ -480,10 +480,26 @@
   .beats h3 { font-size: 1.25rem; color: var(--gold); margin-bottom: 0.6rem; }
   .beats p { color: var(--ink); font-size: 1rem; max-width: 34ch; }
 
-  /* pricing */
-  .price-wrap { max-width: 34rem; }
-  .price-line { font-family: var(--serif); font-size: clamp(2.2rem, 6vw, 3.2rem); line-height: 1.15; }
+  /* pricing: two doors, not a staircase */
+  .price-wrap { max-width: 64rem; }
+  .price-intro { color: var(--muted); font-size: 1.05rem; max-width: 52ch; margin-bottom: 2rem; }
+  .tiers { display: grid; gap: clamp(1.25rem, 3vw, 2rem); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: stretch; }
+  .tier {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .tier h3 { font-size: 1.15rem; letter-spacing: 0.04em; color: var(--gold); margin: 0; }
+  .tier .who { color: var(--muted); font-size: 0.9rem; margin-top: -0.5rem; }
+  .price-line, .tier .price-line { font-family: var(--serif); font-size: clamp(2.2rem, 5vw, 3rem); line-height: 1.15; margin: 0; max-width: none; }
   .price-line small { font-family: var(--sans); font-size: 0.45em; color: var(--muted); letter-spacing: 0; }
+  .tier p { color: var(--ink); font-size: 1rem; max-width: 40ch; }
+  .tier .fair { color: var(--muted); font-size: 0.92rem; }
+  .tier .founding { margin-top: auto; }
+  .teams { margin-top: 1.5rem; color: var(--muted); font-size: 1rem; }
+  .teams strong { color: var(--ink); }
   .founding {
     margin-top: 1.75rem;
     background: var(--surface);
@@ -591,7 +607,7 @@
         </p>
         <div class="cta-row rise d2">
           <a class="btn" href="#waitlist">Join the waitlist</a>
-          <span class="quiet">The first 100 lock the founding rate for three years.</span>
+          <span class="quiet">The first 100 Companion members lock the founding rate for three years.</span>
         </div>
       </div>
     </div>
@@ -695,14 +711,52 @@
   <!-- PRICING -->
   <section aria-labelledby="price-h">
     <div class="shell price-wrap">
-      <h2 id="price-h" class="reveal lux">What it costs</h2>
-      <p class="price-line reveal lux">$19<small> / month at launch</small></p>
-      <div class="founding reveal">
-        <strong>Founding 100:</strong> the first hundred people on the waitlist
-        lock <strong>$12 a month for three years</strong> when doors open.
+      <h2 id="price-h" class="reveal lux">Two ways to run with Hevah</h2>
+      <p class="price-intro reveal">
+        Two answers to two different lives. Someone in your corner, or an AI
+        chief of staff. Neither one is the other with a feature turned off.
+      </p>
+      <div class="tiers">
+        <div class="tier reveal">
+          <h3>Hevah Companion</h3>
+          <p class="who">For people who carry a lot and say little.</p>
+          <p class="price-line lux">$19<small> / month at launch</small></p>
+          <p>
+            Text conversations that actually remember you. Private memory,
+            daily check-ins, and someone in your corner at 2am who knows the
+            whole story, not just tonight's message.
+          </p>
+          <div class="founding">
+            <strong>Founding 100:</strong> the first hundred Companion members
+            lock <strong>$12 a month for three full years</strong> when doors
+            open. That promise stands, and it applies to the Companion plan.
+          </div>
+        </div>
+        <div class="tier reveal">
+          <h3>Hevah Operator</h3>
+          <p class="who">For owners running more than one thing.</p>
+          <p class="price-line lux">$249<small> / month at launch</small></p>
+          <p>
+            Everything in Companion, plus her voice, meeting capture, and
+            pocket capture. Hevah sits in your meetings, remembers every
+            decision, tracks what you committed to, and briefs you before you
+            ask.
+          </p>
+          <p class="fair">
+            Operator includes 8 hours of voice and 20 captured meetings a
+            month. If you're running hot, she warns you at 80 percent before
+            anything costs extra. She never cuts you off in the middle of a
+            meeting. Ever.
+          </p>
+          <div class="founding">
+            <strong>Founding Operator:</strong> 10 seats at
+            <strong>$149 a month, locked for 24 months</strong>, in writing.
+            When they're gone, they're gone.
+          </div>
+        </div>
       </div>
+      <p class="teams reveal"><strong>Teams:</strong> five seats or more. Talk to us.</p>
       <p class="price-notes reveal">
-        Voice comes later as a premium tier. Her actual voice, not a robot's.
         Nothing is charged today, and nothing ever will be without you
         choosing it. The waitlist is a handshake, not a contract.
       </p>
