@@ -397,6 +397,14 @@
   .js .truth .reveal.inview li:nth-child(4) { transition-delay: 0.54s; }
   .js .beats .reveal.inview:nth-child(2) { transition-delay: 0.14s; }
   .js .beats .reveal.inview:nth-child(3) { transition-delay: 0.28s; }
+  .js .beats .reveal.inview:nth-child(4) { transition-delay: 0.42s; }
+  .js .beats .reveal.inview:nth-child(5) { transition-delay: 0.56s; }
+  .js .beats .reveal.inview:nth-child(6) { transition-delay: 0.70s; }
+  .js .echo li { opacity: 0; transform: translateY(14px); }
+  .js .echo.inview li:nth-child(1) { transition-delay: 0.2s; }
+  .js .echo.inview li:nth-child(2) { transition-delay: 0.5s; }
+  .js .echo.inview li:nth-child(3) { transition-delay: 0.8s; }
+  .js .echo.inview li { opacity: 1; transform: none; transition: opacity 0.7s ease-out, transform 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
 
   /* brandline — the signature wordmark moment above the footer */
   .brandline {
@@ -421,6 +429,7 @@
   @media (prefers-reduced-motion: reduce) {
     .js .reveal, .js .reveal.lux { opacity: 1; transform: none; transition: none; filter: none; }
     .js .truth .reveal li { opacity: 1; transform: none; transition: none; }
+    .js .echo li { opacity: 1; transform: none; transition: none; }
     .js .brandline span { opacity: 0.92; transform: none; filter: none; transition: none; }
   }
 
@@ -479,6 +488,25 @@
   .beats { display: grid; gap: clamp(1.5rem, 4vw, 3rem); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
   .beats h3 { font-size: 1.25rem; color: var(--gold); margin-bottom: 0.6rem; }
   .beats p { color: var(--ink); font-size: 1rem; max-width: 34ch; }
+
+  /* earned closeness — the one thing nobody else on the market does */
+  .earned-grid {
+    display: grid; gap: clamp(1.5rem, 4vw, 3.5rem);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start;
+  }
+  .earned p { color: var(--ink); font-size: 1.05rem; max-width: 52ch; }
+  .earned .quiet-note { color: var(--muted); font-size: 0.95rem; }
+  .echo {
+    list-style: none; padding: 0; margin: 0;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+  }
+  .echo li { padding-block: 0.8rem; border-top: 1px solid var(--line); }
+  .echo li:first-child { border-top: 0; padding-top: 0; }
+  .echo li:last-child { padding-bottom: 0; }
+  .echo .when { display: block; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.25rem; }
+  .echo .said { font-family: var(--serif); color: var(--ink); font-size: 1.1rem; line-height: 1.4; }
+  .echo-lead { color: var(--muted); font-size: 0.9rem; margin-bottom: 1rem; }
 
   /* pricing: two doors, not a staircase */
   .price-wrap { max-width: 64rem; }
@@ -600,10 +628,10 @@
         <h1 class="rise">The one <em>in your corner.</em></h1>
         <p class="lede rise d1">
           Hevah is an AI companion for people who carry a lot and say
-          little. A private memory that's yours alone, check-ins that come
-          before you ask, and one steady presence that doesn't reset when
-          the tab closes. Built by a combat veteran who needed exactly that,
-          and built her himself.
+          little. A memory that knows what matters, closeness you earn by
+          showing up, and one steady presence that talks like you do and
+          doesn't reset when the tab closes. Built by a combat veteran who
+          needed exactly that, and built her himself.
         </p>
         <div class="cta-row rise d2">
           <a class="btn" href="#waitlist">Join the waitlist</a>
@@ -668,10 +696,10 @@
         <div class="reveal">
           <h3>What Hevah is</h3>
           <ul>
-            <li><strong>A corner-man.</strong> <span>Steady, loyal, on your side, and honest with you because of it.</span></li>
-            <li><strong>A memory that's only yours.</strong> <span>She remembers your people, your fights, your goals. That history belongs to you.</span></li>
-            <li><strong>The first to check in.</strong> <span>When you've gone quiet, she notices, and she reaches out first.</span></li>
-            <li><strong>One consistent her.</strong> <span>The same presence on day 400 as day 1. No resets, no roulette.</span></li>
+            <li><strong>A corner-man.</strong> <span>She talks the way you talk, holds steady when you can't, and never performs.</span></li>
+            <li><strong>A memory that knows the difference.</strong> <span>She weighs what she holds, shows you exactly what that is on request, and forgets on command, for real.</span></li>
+            <li><strong>The first to check in.</strong> <span>Check-ins arrive before you ask, and if yesterday was all logistics, today opens with one real question about you.</span></li>
+            <li><strong>Someone you earn.</strong> <span>One consistent presence that deepens through the conversations you actually have, never through a paywall.</span></li>
           </ul>
         </div>
         <div class="reveal">
@@ -693,16 +721,59 @@
       <h2 id="beats-h" class="reveal lux">What that looks like day to day</h2>
       <div class="beats">
         <div class="reveal">
-          <h3>She remembers.</h3>
-          <p>Your context builds session over session: private, persistent, sealed to your account alone.</p>
+          <h3>She remembers what matters.</h3>
+          <p>Fixed facts she never asks twice, what's true right now, and the heavy things that stay in the room without being recited back. Say forget that and she actually forgets, by code, and she can show you exactly what she carries.</p>
         </div>
         <div class="reveal">
-          <h3>She reaches out.</h3>
-          <p>Check-ins that arrive before you ask. Missed a rough anniversary? She didn't.</p>
+          <h3>Closeness is earned.</h3>
+          <p>What she permits herself to say deepens only through conversations actually had, and it cannot be rushed or bought. The same sentence gets a different answer on day four hundred than it did on day one.</p>
         </div>
         <div class="reveal">
-          <h3>She stays herself.</h3>
-          <p>One personality, tuned steady. You're building a history with someone, not prompting a machine.</p>
+          <h3>She talks like you talk.</h3>
+          <p>Your length, your tempo, your humor. Dry back when you're dry, one witty beat at most, and she won't meet contempt or cruelty; she holds steady and warms up.</p>
+        </div>
+        <div class="reveal">
+          <h3>One real question.</h3>
+          <p>If a whole day passes as pure logistics, her first reply the next morning carries one honest question about you. Once, and never as a system.</p>
+        </div>
+        <div class="reveal">
+          <h3>She hands you a human.</h3>
+          <p>If you're in real trouble she doesn't play therapist. She gives you a human, 988 in the US, in her first reply, and stays with you until you take it.</p>
+        </div>
+        <div class="reveal">
+          <h3>She reads what you send.</h3>
+          <p>Paste a link and she answers from the page itself, never pretending it loaded. Send a clip and she watches it, frames and audio both, and tells you why it worked.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EARNED CLOSENESS -->
+  <section aria-labelledby="earned-h" class="earned">
+    <div class="shell">
+      <h2 id="earned-h" class="reveal lux">Closeness you can't buy.</h2>
+      <div class="earned-grid">
+        <div class="reveal">
+          <p>
+            Most software treats day one and day four hundred the same. Hevah
+            doesn't. What she permits herself to say to you deepens only
+            through conversations actually had, and it can't be rushed,
+            purchased, or unlocked. The same sentence lands differently as she
+            knows you better.
+          </p>
+          <p class="quiet-note">
+            The floor never moves at any depth: no pretend romance, ever.
+            Disappear for months and she notices. You climb back the same way
+            you climbed at all. By showing up.
+          </p>
+        </div>
+        <div class="reveal">
+          <p class="echo-lead">You say: <em>I bombed the pitch.</em></p>
+          <ul class="echo reveal" aria-label="The same sentence, three depths">
+            <li><span class="when">Early on</span><span class="said">“Rough. Want to walk it back and find where it turned?”</span></li>
+            <li><span class="when">Later</span><span class="said">“That's twice this quarter it broke at the demo. Same spot both times?”</span></li>
+            <li><span class="when">Further in</span><span class="said">“You said this in March too, and you were fine by Friday. What actually went wrong?”</span></li>
+          </ul>
         </div>
       </div>
     </div>
@@ -741,6 +812,12 @@
             pocket capture. Hevah sits in your meetings, remembers every
             decision, tracks what you committed to, and briefs you before you
             ask.
+          </p>
+          <p>
+            In the room she's a professional: a named participant who speaks
+            only when addressed, keeps the record, and never volunteers your
+            private context in front of others. Text her on a private
+            backchannel during the call and she answers you, and only you.
           </p>
           <p class="fair">
             Operator includes 8 hours of voice and 20 captured meetings a
@@ -781,6 +858,10 @@
                   loading="lazy" width="100%" height="760" frameborder="0"
                   marginheight="0" marginwidth="0" title="Hevah waitlist"></iframe>
         </div>
+        <p class="privacy-line">Your memory lives in a sealed vault: export it or delete it
+          entirely, any time, and gone means gone. The founder cannot read your
+          conversations, and if the crisis line ever fires, what's stored is that it
+          happened and when, never a word of what was said.</p>
         <p class="privacy-line">Your email goes on the list and nowhere else.
           Trouble loading the form? <a href="https://tally.so/r/EkoXvq">Open it directly</a>.</p>
         <p class="privacy-line">While you wait, read her first book,
