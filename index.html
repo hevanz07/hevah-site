@@ -155,11 +155,17 @@
   .hero-cinema .cinema-still { display: none; }
   .hero-cinema.still video { display: none; }
   .hero-cinema.still .cinema-still { display: block; }
-  /* HER, MADE OF LIGHT (2026-09-13): the particle field replaces the ambient film.
-     She gathers out of the ember dust when the intro lifts, turns toward the
-     pointer, and dissolves back into the field as you scroll into the story. */
-  #hevah-face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .hero-cinema.still #hevah-face { display: none; }
+  /* THE ARRIVAL (2026-09-13, Errol: "lets see the second option"): she stays REAL.
+     The particle field is the room and the arrival: light gathers into her shape
+     out of the ember dust, holds a beat, then the film rises through it as the
+     light releases into an ambient field that keeps drifting and sways with the
+     pointer. The film itself is her. */
+  #hevah-face { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 1; }
+  .hero-cinema.field.still .cinema-still { opacity: 0; }            /* film failed: the light arrives over the still instead */
+  .hero-cinema.field.arrived.still .cinema-still { opacity: 1; transition: opacity 2.2s ease-out; }
+  .hero-cinema.field video { opacity: 0; }          /* the field hands her over */
+  .hero-cinema.field.arrived video { opacity: 1; transition: opacity 2.2s ease-out; }
+  .hero-cinema::after { z-index: 2; }               /* the legibility veil stays on top of both */
   /* legibility veil: darkness rolls in from the left, where the words live */
   .hero-cinema::after {
     content: ""; position: absolute; inset: 0;
@@ -646,8 +652,14 @@
       </div>
     </div>
     <div class="hero-cinema" id="hero-cinema" aria-hidden="true">
-      <!-- her face as a particle field (assets/hevah-field.js + assets/field/*.bin,
-           baked from the gold portrait). No WebGL / load failure → the still. -->
+      <!-- the eternal ambient loop — she, real. Hidden until the light has gathered
+           into her shape (the arrival), then it rises through the field. -->
+      <video id="cinema" muted loop playsinline
+             poster="assets/hevah-cinema-poster.jpg" preload="auto">
+        <source src="assets/hevah-cinema-web.mp4?v=3" type="video/mp4">
+      </video>
+      <!-- the light: assets/hevah-field.js + assets/field/*.bin (baked from the gold
+           portrait). No WebGL / no data → the film plays as before; no film → the still. -->
       <canvas id="hevah-face"></canvas>
       <img class="cinema-still" src="assets/hevah-cinema-poster.jpg" alt="">
     </div>
@@ -1231,17 +1243,23 @@
      off screen. */
   var faceCanvas = document.getElementById('hevah-face');
   var faceWrap = document.getElementById('hero-cinema');
-  var face = null, faceState = { form: 0, yaw: 0, pitch: 0, gazeX: 0, gazeY: 0 };
+  var face = null, faceState = { form: 0, yaw: 0, pitch: 0, gazeX: 0, gazeY: 0, phase: 'waiting', fade: 1 };
   var faceSac = { x: 0, y: 0, at: 0 }, faceIdle = 0, faceLast = 0, faceReadyAt = 0;
+  /* the arrival timeline (ms from the moment both the intro has lifted and her data is here) */
+  var ARRIVE = { gather: 1800, hold: 700, release: 2400 };
   (function () {
-    if (!faceCanvas || !window.HevahField) { if (faceWrap) faceWrap.classList.add('still'); return; }
+    /* no engine / no WebGL / no data → the film simply plays (the page as it was) */
+    if (!faceCanvas || !window.HevahField) return;
     var f = window.HevahField(faceCanvas, { maxDpr: 1.5 });
-    if (!f) { faceWrap.classList.add('still'); return; }
+    if (!f) return;
+    faceWrap.classList.add('field');   /* the film waits for the light */
     var small = window.innerWidth < 768;
+    var guard = setTimeout(function () { if (!face) faceWrap.classList.remove('field'); }, 6000);   /* slow data: don't hold the film hostage */
     f.load('assets/field/' + (small ? 'hevah-24k' : 'hevah-60k')).then(function () {
+      clearTimeout(guard);
       face = f; faceReadyAt = performance.now();
-      if (reduced) { face.render(0.8, faceFrame(0.8, 1)); }   /* one still, fully formed */
-    }).catch(function () { faceWrap.classList.add('still'); });
+      if (reduced) { faceWrap.classList.remove('field'); faceWrap.classList.add('arrived'); face.render(0.8, faceFrame(0.8, 0)); faceState.phase = 'ambient'; }   /* still: the film + a calm field */
+    }).catch(function () { clearTimeout(guard); faceWrap.classList.remove('field'); });
     window.addEventListener('resize', function () { if (face) face.resize(); });
   })();
   /* her placement on the canvas: right of the words on wide screens, centered on phones */
@@ -1252,7 +1270,8 @@
     var scale = wide ? Math.max(h * 1.12, w * 0.52) / 1000 : Math.max(h * 0.78, w * 1.25) / 1000;
     return { form: formOverride === undefined ? faceState.form : formOverride, yaw: faceState.yaw, pitch: faceState.pitch,
              gazeX: faceState.gazeX, gazeY: faceState.gazeY, offX: wide ? w * 0.17 : 0, offY: wide ? -h * 0.02 : h * 0.14,
-             scale: scale, fade: 1, size: wide ? 2.6 : 2.0 };
+             lookX: (cx - 0.5) * 2, lookY: (0.5 - cy) * 2,
+             scale: scale, fade: faceState.fade, size: wide ? 2.6 : 2.0 };
   }
   function faceCenterPx() {   /* where her face sits, in viewport px (for the pointer to look from) */
     var w = faceCanvas.clientWidth || 1, h = faceCanvas.clientHeight || 1, fr = faceFrame(0, 0);
@@ -1264,12 +1283,20 @@
     var dt = faceLast ? Math.min(0.05, (t - faceLast) / 1000) : 0.016; faceLast = t;
     /* off screen: nothing to draw */
     if (scY > vh * 1.15) return;
-    /* formation: gathers over 1.8 s once BOTH the intro has lifted and her data is here
-       (never a pop-in on a slow connection); dissolves across the first half-screen of scroll */
+    /* THE ARRIVAL, once BOTH the intro has lifted and her data is here (never a pop-in):
+       gather (light → her shape) → hold a beat → release (the film rises through the
+       light as it lets go into the room) → ambient (a calm field around the real her) */
     var start = Math.max(faceFormAt, faceReadyAt);
-    var gather = faceFormAt ? Math.min(1, Math.max(0, (t - start) / 1800)) : 0;
-    var dissolve = Math.min(1, Math.max(0, scY / (vh * 0.55)));
-    faceState.form = gather * (1 - dissolve);
+    var ms = faceFormAt ? t - start : -1;
+    var ease = function (u) { u = Math.min(1, Math.max(0, u)); return u * u * (3 - 2 * u); };
+    if (ms < 0) { faceState.phase = 'waiting'; faceState.form = 0; faceState.fade = 1; }
+    else if (ms < ARRIVE.gather) { faceState.phase = 'gather'; faceState.form = ms / ARRIVE.gather; faceState.fade = 1; }
+    else if (ms < ARRIVE.gather + ARRIVE.hold) { faceState.phase = 'hold'; faceState.form = 1; faceState.fade = 1; }
+    else if (ms < ARRIVE.gather + ARRIVE.hold + ARRIVE.release) {
+      var r = ease((ms - ARRIVE.gather - ARRIVE.hold) / ARRIVE.release);
+      faceState.phase = 'release'; faceState.form = 1 - r; faceState.fade = 1 - 0.45 * r;
+      if (!faceWrap.classList.contains('arrived')) faceWrap.classList.add('arrived');   /* the film fades in over the release */
+    } else { faceState.phase = 'ambient'; faceState.form = 0; faceState.fade = 0.55; }
     /* attention: she looks at the pointer (eyes in 80 ms, head in 350 ms); alone, a slow drift + saccades */
     var c = faceCenterPx(), ty, tp, gx, gy;
     if (fine && hasPointer) {
@@ -1450,7 +1477,7 @@
                particles: field ? field.count : motes.length };
     },
     sample: function () { return field ? field.sample() : -1; },
-    face: function () { return face ? { ready: true, count: face.count, form: faceState.form, yaw: faceState.yaw, gaze: [faceState.gazeX, faceState.gazeY], lit: face.sample(faceCenterPx().x, faceCenterPx().y), center: faceCenterPx() } : { ready: false, still: faceWrap ? faceWrap.classList.contains('still') : null }; },
+    face: function () { return face ? { ready: true, count: face.count, phase: faceState.phase, form: +faceState.form.toFixed(3), fade: faceState.fade, yaw: faceState.yaw, gaze: [faceState.gazeX, faceState.gazeY], wrap: faceWrap.className, film: (function () { var v = document.getElementById('cinema'); return v ? { opacity: getComputedStyle(v).opacity, playing: !v.paused, ready: v.readyState } : null; })() } : { ready: false, wrap: faceWrap ? faceWrap.className : null }; },
     formNow: function () { faceFormAt = performance.now() - 5000; }
   };
   if (!reduced) {

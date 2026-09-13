@@ -23,7 +23,7 @@
       'attribute vec3 a_col;',
       'attribute vec4 a_misc;',      /* w (size), head, eye, seed */
       'uniform float u_time, u_form, u_yaw, u_pitch, u_faceW, u_scale, u_dpr, u_fade, u_size;',
-      'uniform vec2 u_gaze, u_view, u_offset;',
+      'uniform vec2 u_gaze, u_view, u_offset, u_look;',
       'uniform vec3 u_headC;',
       'varying vec3 v_col;',
       'varying float v_a;',
@@ -44,6 +44,8 @@
       /* the scattered state: a wide, slowly drifting cloud around and below her */
       '  vec3 scat = vec3((s2 - 0.5) * 2800.0, (s3 - 0.5) * 2000.0 - 150.0, (s4 - 0.5) * 900.0);',
       '  scat += vec3(sin(u_time * 0.16 + seed * 50.0) * 70.0, cos(u_time * 0.13 + s2 * 60.0) * 55.0, 0.0);',
+      /* the loose field sways with the pointer, deeper points more (parallax) — the room notices you */
+      '  scat.xy += u_look * vec2(140.0, 90.0) * (0.35 + s4);',
       /* staggered gather: each point has its own window inside the formation */
       '  float f = smoothstep(seed * 0.55, seed * 0.55 + 0.45, u_form);',
       '  float e = f * f * (3.0 - 2.0 * f);',
@@ -90,7 +92,7 @@
     gl.useProgram(prog);
     var A = { pos: gl.getAttribLocation(prog, 'a_pos'), col: gl.getAttribLocation(prog, 'a_col'), misc: gl.getAttribLocation(prog, 'a_misc') };
     var U = {};
-    ['u_time', 'u_form', 'u_yaw', 'u_pitch', 'u_faceW', 'u_scale', 'u_dpr', 'u_fade', 'u_size', 'u_gaze', 'u_view', 'u_offset', 'u_headC'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+    ['u_time', 'u_form', 'u_yaw', 'u_pitch', 'u_faceW', 'u_scale', 'u_dpr', 'u_fade', 'u_size', 'u_gaze', 'u_view', 'u_offset', 'u_headC', 'u_look'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
     gl.disable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE);
@@ -153,6 +155,7 @@
         gl.uniform1f(U.u_yaw, s.yaw || 0);
         gl.uniform1f(U.u_pitch, s.pitch || 0);
         gl.uniform2f(U.u_gaze, s.gazeX || 0, s.gazeY || 0);
+        gl.uniform2f(U.u_look, s.lookX || 0, s.lookY || 0);
         gl.uniform1f(U.u_scale, scale);
         gl.uniform2f(U.u_offset, (s.offX || 0) * dpr, (s.offY || 0) * dpr);
         gl.uniform1f(U.u_fade, s.fade === undefined ? 1 : s.fade);
