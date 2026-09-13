@@ -903,6 +903,7 @@
     var loop = document.getElementById('cinema');
     var seen = false;
     try { seen = sessionStorage.getItem('hevah-intro') === '1'; } catch (e) {}
+    if (/[?&]nointro=1\b/.test(location.search)) seen = true;   /* verification runs skip the film */
 
     function heroStart() {
       document.documentElement.classList.remove('intro-hold');
@@ -1247,10 +1248,11 @@
   function faceFrame(tSec, formOverride) {
     var w = faceCanvas.clientWidth || 1, h = faceCanvas.clientHeight || 1;
     var wide = w >= 900;
-    var scale = wide ? Math.max(h * 1.12, w * 0.52) / 1000 : Math.max(h * 0.92, w * 1.35) / 1000;
+    /* phones: she stands in the upper half, above the words (which carry the dark veil below) */
+    var scale = wide ? Math.max(h * 1.12, w * 0.52) / 1000 : Math.max(h * 0.78, w * 1.25) / 1000;
     return { form: formOverride === undefined ? faceState.form : formOverride, yaw: faceState.yaw, pitch: faceState.pitch,
-             gazeX: faceState.gazeX, gazeY: faceState.gazeY, offX: wide ? w * 0.17 : 0, offY: wide ? -h * 0.02 : -h * 0.06,
-             scale: scale, fade: 1, size: wide ? 2.6 : 2.2 };
+             gazeX: faceState.gazeX, gazeY: faceState.gazeY, offX: wide ? w * 0.17 : 0, offY: wide ? -h * 0.02 : h * 0.14,
+             scale: scale, fade: 1, size: wide ? 2.6 : 2.0 };
   }
   function faceCenterPx() {   /* where her face sits, in viewport px (for the pointer to look from) */
     var w = faceCanvas.clientWidth || 1, h = faceCanvas.clientHeight || 1, fr = faceFrame(0, 0);
