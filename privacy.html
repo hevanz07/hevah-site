@@ -1,0 +1,127 @@
+<!doctype html>
+<!-- ============================================================
+     HEVAH — Privacy. Plain English, true to the code.
+     Written 2026-10-12 by the founder with his assistant; not yet
+     reviewed by an attorney (that review is on the list). Every
+     claim here matches cortana-server/hevah/* as of commit 8eb6130.
+     Deploys ONLY on Errol's explicit GO (push = publish).
+     ============================================================ -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy | HEVAH</title>
+<meta name="description" content="What HEVAH keeps, who can see it, and how you take it with you or erase it. Plain English.">
+<meta name="robots" content="index,follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23121009'/%3E%3Ctext x='32' y='44' font-family='Georgia,serif' font-size='34' text-anchor='middle' fill='%23e0b35a'%3EH%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;700&family=Atkinson+Hyperlegible:wght@400;700&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: oklch(0.07 0 0); --surface: oklch(0.115 0.008 68); --ink: oklch(0.94 0.012 68);
+    --muted: oklch(0.71 0.02 68); --gold: oklch(0.74 0.162 68); --line: oklch(0.24 0.015 68);
+    --serif: "Young Serif", Georgia, serif;
+    --sans: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 1.0625rem; line-height: 1.75; -webkit-font-smoothing: antialiased; }
+  .shell { max-width: 42rem; margin: 0 auto; padding: 2.5rem 1.25rem 5rem; }
+  header a.brand { font-family: var(--serif); color: var(--gold); text-decoration: none; letter-spacing: 0.14em; font-size: 1.1rem; }
+  header nav { margin-top: 0.4rem; font-size: 0.9rem; color: var(--muted); }
+  header nav a { color: var(--muted); }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(1.9rem, 5vw, 2.6rem); line-height: 1.15; margin: 2.2rem 0 0.6rem; }
+  .lede { color: var(--muted); font-size: 1.1rem; }
+  .asof { color: var(--muted); font-size: 0.9rem; margin-top: 0.6rem; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: 1.35rem; margin: 2.4rem 0 0.7rem; color: var(--gold); }
+  p + p, ul + p { margin-top: 0.9rem; }
+  ul { padding-left: 1.2rem; margin-top: 0.6rem; }
+  li + li { margin-top: 0.45rem; }
+  .box { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.2rem; margin-top: 1.2rem; }
+  .box strong { color: var(--gold); }
+  a { color: var(--gold); }
+  footer { border-top: 1px solid var(--line); margin-top: 3.5rem; padding-top: 1.4rem; color: var(--muted); font-size: 0.9rem; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <a class="brand" href="/">HEVAH</a>
+    <nav><a href="/privacy">Privacy</a> &middot; <a href="/terms">Terms</a></nav>
+  </header>
+
+  <h1>Privacy</h1>
+  <p class="lede">What HEVAH keeps, who can see it, and how you take it with you or erase it. Written so you can actually read it.</p>
+  <p class="asof">Effective October 12, 2026. HEVAH is operated by Kage Solutions LLC, an Arizona company.</p>
+
+  <div class="box">
+    <p><strong>The short version.</strong> Your conversations are sealed to your seat. The person who gave you your key can see that your seat exists and how many messages it has, never a word of what you said. Nothing is sold, nothing is used for ads. You can read everything she carries about you, remove any line, download all of it, or erase all of it, any time, from the menu.</p>
+  </div>
+
+  <h2>What HEVAH is</h2>
+  <p>HEVAH is an AI companion. She is software, not a person, and the app tells you so when you open it. She is for adults, 18 and over. She is not a therapist, a doctor, a lawyer or a financial adviser, and she does not pretend to be. If you are in crisis, call or text 988 in the US, or your local emergency number.</p>
+
+  <h2>What we keep</h2>
+  <ul>
+    <li><strong>Your name and pronouns</strong>, as they were set when your key was made, and anything you change them to.</li>
+    <li><strong>Your conversation</strong>: what you write to her and what she writes back. We keep the most recent 2,000 messages for your seat.</li>
+    <li><strong>What she carries about you</strong>: short memory lines she distills from your conversations now and then (things that are known for sure, things true right now, things still open), each dated. You can see every one of them in the menu under "What I carry about you" and let any of them go.</li>
+    <li><strong>Daily check-ins, only if you turn them on</strong>: the hour you picked, your timezone, and the push subscription your phone gives us so her message can reach you. Turn check-ins off and the subscription is deleted.</li>
+    <li><strong>A usage count</strong>: how many messages you sent today, for the daily limit.</li>
+    <li><strong>A crisis record</strong>: if a conversation triggers her crisis response, we keep when it happened and how serious it was judged, as levels and timestamps only, never the words.</li>
+    <li><strong>An events log</strong> that records that something happened (a key was used, a message was sent, an erase completed). It never contains what was said.</li>
+    <li><strong>A session cookie</strong> so you stay signed in, for up to 180 days. Your IP address is checked briefly at the door to limit abuse; it is not stored with your seat.</li>
+  </ul>
+
+  <h2>What we do not do</h2>
+  <ul>
+    <li>We do not read your conversations. The seal is built into the code: no admin screen returns a word of any user's conversation or memory.</li>
+    <li>We do not sell or share your information for marketing, and we do not run ads.</li>
+    <li>We do not track you across other websites or apps.</li>
+    <li>We do not record audio. HEVAH is text.</li>
+    <li>We do not knowingly keep information about anyone under 18. If you believe a minor has a seat, write to us and it will be erased.</li>
+  </ul>
+
+  <h2>Who touches your data to make her work</h2>
+  <p>HEVAH runs on a small number of services. Each sees only what it needs to do its job:</p>
+  <ul>
+    <li><strong>Anthropic</strong> generates her replies. For each reply, your recent messages and her memory lines for you are sent to Anthropic's API. If their service is unavailable, <strong>OpenAI</strong>'s API may be used the same way. Under both companies' business API terms, data sent this way is not used to train their models.</li>
+    <li><strong>Upstash</strong> stores your seat's data, encrypted in transit, under keys that belong only to your seat.</li>
+    <li><strong>Replit</strong> hosts the service, in the United States.</li>
+    <li><strong>Sentry</strong> receives error reports when something breaks. Those reports carry technical details, never your words.</li>
+    <li><strong>Your phone's push service</strong> (Apple, Google or Mozilla, depending on your device) carries her daily check-in to your screen, if you turned check-ins on. The text of that check-in passes through them.</li>
+    <li><strong>Stripe</strong> handles payment when billing is on. We never see your card number.</li>
+  </ul>
+
+  <h2>If a conversation turns serious</h2>
+  <p>If what you write suggests you may be in danger, HEVAH gives you the 988 Suicide &amp; Crisis Lifeline in her reply and stays with you. The operator may receive an alert that a crisis response happened on a seat, with no words from your conversation, so that a human knows the system did its job. Nobody is notified on your behalf and nobody is contacted for you; that choice stays yours.</p>
+
+  <h2>How long we keep it, and how you end it</h2>
+  <ul>
+    <li><strong>See it:</strong> Menu, then "What I carry about you".</li>
+    <li><strong>Correct it:</strong> tell her, or let a line go from that same screen.</li>
+    <li><strong>Take it with you:</strong> Menu, then "Download everything I've shared". You get your whole conversation and memory as a file.</li>
+    <li><strong>Erase it:</strong> Menu, then "Erase everything, permanently". This deletes your conversation, her memory of you, your settings, your usage count, the crisis record and any check-in devices. The app only tells you it is done after it has read the storage back and found nothing left. If that read-back fails, it tells you that instead.</li>
+  </ul>
+  <p>We do not keep separate backups of conversations. Our database provider maintains its own short-lived redundancy for reliability, governed by its retention schedule. The events log (which holds no words) is kept for operating the service.</p>
+
+  <h2>Security</h2>
+  <p>Everything travels over HTTPS. Your key works once and then dies. Sessions are signed cookies the browser cannot read from scripts. Data is stored under per-seat keys, and the door is rate-limited against abuse. No system is perfect; if we ever learn that your data was exposed, we will tell you plainly and promptly.</p>
+
+  <h2>Your rights</h2>
+  <p>Wherever you live, you can see, correct, export and erase your data using the menu, with no request form and no waiting. If you are a California resident, you also have the rights to know what we hold, to delete it, to correct it, and not to be treated differently for exercising those rights; we do not sell or share personal information as those words are defined in California law. If you cannot reach the menu, email us and a human will do it for you.</p>
+
+  <h2>Changes</h2>
+  <p>If this page changes, the date at the top changes with it, and anything that matters to you will be said in the app, not buried here.</p>
+
+  <h2>Contact</h2>
+  <p>Kage Solutions LLC, Arizona, United States. Email: <a href="mailto:privacy@hevah.ai">privacy@hevah.ai</a>.</p>
+
+  <footer>
+    <p>HEVAH is a companion, not a medical or crisis service. If you're in crisis, call or text 988 (US) to reach a human right now.</p>
+    <p style="margin-top:0.6rem"><a href="/">hevah.ai</a> &middot; <a href="/terms">Terms</a></p>
+  </footer>
+</div>
+</body>
+</html>
