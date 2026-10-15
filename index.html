@@ -538,6 +538,9 @@
   .tier p { color: var(--ink); font-size: 1rem; max-width: 40ch; }
   .tier .fair { color: var(--muted); font-size: 0.92rem; }
   .tier .founding { margin-top: auto; }
+  .tier .btn.seat { align-self: flex-start; margin-top: 0.25rem; }
+  .tier .seat-note { margin-top: -0.25rem; }
+  .tier .seat-note a { color: var(--gold); }
   .teams { margin-top: 1.5rem; color: var(--muted); font-size: 1rem; }
   .teams strong { color: var(--ink); }
   .founding {
@@ -818,9 +821,13 @@
           </p>
           <div class="founding">
             <strong>Founding 100:</strong> the first hundred Companion members
-            lock <strong>$12 a month for three full years</strong> when doors
-            open. That promise stands, and it applies to the Companion plan.
+            lock <strong>$12 a month for three full years</strong>. That
+            promise stands, and it applies to the Companion plan.
           </div>
+          <!-- The paid door (2026-10-15): Stripe Checkout, then straight back to a
+               personal key. Served by app.hevah.ai; the page itself never sees a card. -->
+          <a class="btn seat" href="https://app.hevah.ai/hevah/pay/founding">Take a founding seat</a>
+          <p class="fair seat-note">$12 a month, cancel any time from inside Hevah. Prefer the list price? <a href="https://app.hevah.ai/hevah/pay/companion">$19 a month, no lock.</a></p>
         </div>
         <div class="tier reveal">
           <h3>Hevah Operator</h3>
@@ -857,8 +864,9 @@
       </div>
       <p class="teams reveal"><strong>Teams:</strong> five seats or more. Talk to us.</p>
       <p class="price-notes reveal">
-        Nothing is charged today, and nothing ever will be without you
-        choosing it. The waitlist is a handshake, not a contract.
+        Nothing is ever charged without you choosing it, and you can cancel
+        from inside Hevah any time. Not ready? The waitlist below is a
+        handshake, not a contract.
       </p>
     </div>
   </section>
